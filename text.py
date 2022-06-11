@@ -3,6 +3,120 @@ from typing import Sequence, Iterable
 from megacodist.exceptions import LoopBreakException
 
 
+def GetFirstIndexLTR(
+        text: str,
+        search: str,
+        start: int | None = None,
+        end: int | None = None,
+        /
+        ) -> int:
+    """Returns the first index of occurrence any of characters of 'search'
+    in 'text' from left ('start' defaults to None or 0 index) to right ('end'
+    defaults to None or len(text) - 1).
+
+    Exceptions:
+    TypeError: there are some invalid parameter types or 'end' is less than
+    'start'.
+    ValueError: there is no occurrence of 'search' characters from 'start'
+    index in the 'text'.
+    """
+    from functools import partial
+
+    # Checking parameters types...
+    if not isinstance(text, str):
+        raise TypeError("'text' must be string.")
+    if not isinstance(search, str):
+        raise TypeError("'search' must be string.")
+    if (start is not None) and (not isinstance(start, int)):
+        raise TypeError("'start' must be None or integer.")
+    if (end is not None) and (not isinstance(end, int)):
+        raise TypeError("'end' must be None or integer.")
+
+    def _GetIndexLTR(
+            ch: str,
+            text: str,
+            start: int = 0,
+            end: int | None = None
+            ) -> int | None:
+        try:
+            return text.index(ch, start, end)
+        except ValueError:
+            return None
+
+    FindAnyLTR = partial(
+        _GetIndexLTR,
+        text=text,
+        start=start,
+        end=end)
+    try:
+        return min(filter(
+            lambda a: a is not None,
+            map(
+                FindAnyLTR,
+                search)))
+    except ValueError as err:
+        err.args = (
+            "No occurrence of any of 'search' was found in 'text'",)
+        raise err
+
+
+def GetFirstIndexRTL(
+        text: str,
+        search: str,
+        start: int | None = None,
+        end: int | None = None,
+        /
+        ) -> int:
+    """Returns the first index of occurrence any of characters of 'search'
+    in 'text' from right ('end' defaults to None or len(text) - 1) to  left
+    ('start' defaults to None or 0 index) .
+
+    Exceptions:
+    TypeError: there are some invalid parameter types or 'end' is less than
+    'start'.
+    ValueError: there is no occurrence of 'search' characters from 'start'
+    index in the 'text'.
+    """
+    from functools import partial
+
+    # Checking parameters types...
+    if not isinstance(text, str):
+        raise TypeError("'text' must be string.")
+    if not isinstance(search, str):
+        raise TypeError("'search' must be string.")
+    if (start is not None) and (not isinstance(start, int)):
+        raise TypeError("'start' must be None or integer.")
+    if (end is not None) and (not isinstance(end, int)):
+        raise TypeError("'end' must be None or integer.")
+
+    def _GetIndexRTL(
+            ch: str,
+            text: str,
+            start: int = 0,
+            end: int | None = None
+            ) -> int | None:
+        try:
+            return text.rindex(ch, start, end)
+        except ValueError:
+            return None
+
+    FindAnyRTL = partial(
+        _GetIndexRTL,
+        text=text,
+        start=start,
+        end=end)
+    try:
+        return max(filter(
+            lambda a: a is not None,
+            map(
+                FindAnyRTL,
+                search)))
+    except ValueError as err:
+        err.args = (
+            "No occurrence of any of 'search' was found in 'text'",)
+        raise err
+
+
 def GetCommonAffix(
         texts: Iterable[Sequence],
         is_suffix: bool = False
