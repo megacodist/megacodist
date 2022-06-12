@@ -35,7 +35,7 @@ def GetFirstIndexLTR(
     def _GetIndexLTR(
             ch: str,
             text: str,
-            start: int = 0,
+            start: int | None = None,
             end: int | None = None
             ) -> int | None:
         try:
@@ -92,7 +92,7 @@ def GetFirstIndexRTL(
     def _GetIndexRTL(
             ch: str,
             text: str,
-            start: int = 0,
+            start: int | None = None,
             end: int | None = None
             ) -> int | None:
         try:
