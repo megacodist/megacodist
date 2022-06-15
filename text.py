@@ -1,9 +1,28 @@
-from typing import Sequence, Iterable
+from enum import Enum
+import string
+from typing import Iterator, Sequence, Iterable
 
 from megacodist.exceptions import LoopBreakException
 
 
-def GetFirstIndexLTR(
+# Defining constants...
+class Delimiters(Enum):
+    WHITE_SPACES = string.whitespace
+    NEW_LINE_CHARS = [
+        '\n',	    # Line Feed
+        '\r',	    # Carriage Return
+        '\r\n',	    # Carriage Return + Line Feed
+        '\v',	    # Line Tabulation
+        '\f',	    # Form Feed
+        '\x1c',	    # File Separator
+        '\x1d',	    # Group Separator
+        '\x1e', 	# Record Separator
+        '\x85',	    # Next Line (C1 Control Code)
+        '\u2028',	# Line Separator
+        '\u2029',]	# Paragraph Separator
+
+
+def IndexAnyLTR(
         text: str,
         search: str,
         start: int | None = None,
@@ -60,7 +79,7 @@ def GetFirstIndexLTR(
         raise err
 
 
-def GetFirstIndexRTL(
+def IndexAnyRTL(
         text: str,
         search: str,
         start: int | None = None,
@@ -115,6 +134,60 @@ def GetFirstIndexRTL(
         err.args = (
             "No occurrence of any of 'search' was found in 'text'",)
         raise err
+
+
+def SplitAnyIter(
+        text: str,
+        delimiters: str | Delimiters = Delimiters.WHITE_SPACES,
+        minSize: int = 0
+        ) -> Iterator[str]:
+    """Splits 'text' at any element of 'delimiters' and returns them as
+    iterator (not a list). With the specified 'minSize' this slicing
+    happens after that number of characters. For delimiters any member
+    of Delimiters enumeration in this module can be used, or you can
+    assign any string, default is Delimiters.WHITE_SPACES. This function
+    'eats' any delimiter at the start of chuncks.
+    """
+    if isinstance(delimiters, Delimiters):
+        delimiters = delimiters.value
+    start = 0
+    while True:
+        # Stripping (eating) leading delimiters at the start of this chunck...
+        try:
+            while text[start] in delimiters:
+                start += 1
+        except IndexError:
+            # There were only delimiters on the remainder of 'text'...
+            # Returning an empty string...
+            yield ''
+            return
+
+        end = start + minSize
+        if minSize:
+            if end >= len(text):
+                yield text[start:]
+                return
+            elif text[end] in delimiters:
+                yield text[start:end]
+                start = end
+                continue
+
+        # Finding the nearest delimiter on the right...
+        try:
+            delimIndex = IndexAnyLTR(
+                text,
+                delimiters,
+                end)
+        except ValueError:
+            pass
+        if delimIndex:
+            yield text[start:delimIndex]
+            start = delimIndex
+        else:
+            # No white delimiter was found on the remainder of 'text'
+            # Returning the rest of text
+            yield text[start:]
+            return
 
 
 def GetCommonAffix(
