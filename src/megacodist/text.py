@@ -2,7 +2,7 @@ from enum import Enum
 import string
 from typing import Iterator, Sequence, Iterable
 
-from megacodist.exceptions import LoopBreakException
+from .exceptions import LoopBreakException
 
 
 # Defining constants...

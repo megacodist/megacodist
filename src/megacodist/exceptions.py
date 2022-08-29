@@ -1,4 +1,10 @@
+"""This module offers the following complementary exceptions:
 
+⬤ LoopBreakException
+⬤ DuplicateError
+⬤ InsertionError
+⬤ IntervalError
+"""
 
 class LoopBreakException(Exception):
     '''This exception is used to break nested loops.'''

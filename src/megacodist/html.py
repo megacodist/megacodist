@@ -1,6 +1,5 @@
 from collections import deque
 from html.parser import HTMLParser
-import re
 
 
 _SINGLETON_ELEMS = [
