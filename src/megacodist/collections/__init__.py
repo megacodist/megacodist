@@ -250,17 +250,17 @@ class SortedList(Sequence):
         
         # Getting comparer...
         try:
-            if self._key:
+            if self._key and not isinstance(value, _DataComparerPair):
                 value_ = _DataComparerPair(
                     value,
                     self._key(value))
             else:
                 value_ = value
-        except Exception:
+        except Exception as err:
             raise ValueError("'value' is not compatible with 'key' comparer.")
         
         # Finding index...
-        idx = bisect_right(self._items, value_, start, end, key=self._key)
+        idx = bisect_right(self._items, value_, start, end)
         if idx == 0:
             return False, 0
         else:
@@ -311,7 +311,7 @@ class SortedList(Sequence):
                     self._key(value))
             else:
                 value_ = value
-        except Exception:
+        except Exception as err:
             raise ValueError("'value' is not compatible with 'key' comparer.")
 
         existed, idx = self.index(value_, start, end)
