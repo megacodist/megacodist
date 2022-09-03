@@ -2,7 +2,7 @@ from collections import deque
 from html.parser import HTMLParser
 
 
-_SINGLETON_ELEMS = [
+SINGLETON_ELEMS = [
     'area',
     'base',
     'br',
@@ -16,6 +16,7 @@ _SINGLETON_ELEMS = [
     'link',
     'meta',
     'param',
+    'script',
     'source',
     'track',
     'wbr']
@@ -29,8 +30,8 @@ class TagMismatchError(Exception):
 
 
 class HtmlTagsChecker(HTMLParser):
-    '''An instance of this class can be used to check thecorrect layout
-    of tags in an HTML code. The 'feed' method is the only method
+    '''An instance of this class can be used to check the correctness of
+    layout of tags in an HTML code. The 'feed' method is the only method
     that should be used.
     '''
     def __init__(self, *, convert_charrefs: bool = True) -> None:
@@ -70,16 +71,24 @@ class HtmlTagsChecker(HTMLParser):
                     # Its corresponding starting tag is found...
                     self._tagsStack.pop()
                     return
-                elif (self._tagsStack[-1] in _SINGLETON_ELEMS):
+                elif (self._tagsStack[-1] in SINGLETON_ELEMS):
                     self._tagsStack.pop()
                 # So far we have not found a corresponding starting tag for it
-                elif tag in _SINGLETON_ELEMS:
+                elif tag in SINGLETON_ELEMS:
                     return
                 else:
                     raise TagMismatchError()
         except IndexError:
             # Tags stack is exhausted, so it's an orphan ending tag...
             raise TagMismatchError()
+    
+    def handle_startendtag(
+            self,
+            tag: str,
+            attrs: list[tuple[str, str | None]]
+            ) -> None:
+        # A  self-closing element does not affect the layout validation
+        pass
 
 
 class HtmlTagsOutliner_backup(HTMLParser):
@@ -155,12 +164,12 @@ class HtmlTagsOutliner_backup(HTMLParser):
                     self._tagsStack.pop()
                     self._level -= 1
                     return
-                elif (self._tagsStack[-1] in _SINGLETON_ELEMS):
+                elif (self._tagsStack[-1] in SINGLETON_ELEMS):
                     self._append_tag(f'</{tag}>')
                     self._tagsStack.pop()
                     self._level -= 1
                 # So far we have not found a corresponding starting tag for it
-                elif tag in _SINGLETON_ELEMS:
+                elif tag in SINGLETON_ELEMS:
                     return
                 else:
                     raise TagMismatchError()
@@ -246,12 +255,12 @@ class HtmlTagsOutliner(HTMLParser):
                     self._lastTag = tag
                     self._isLastOpen = False
                     return
-                elif (self._tagsStack[-1] in _SINGLETON_ELEMS):
+                elif (self._tagsStack[-1] in SINGLETON_ELEMS):
                     self._append_tag(f'</{tag}>')
                     self._tagsStack.pop()
                     self._level -= 1
                 # So far we have not found a corresponding starting tag for it
-                elif tag in _SINGLETON_ELEMS:
+                elif tag in SINGLETON_ELEMS:
                     return
                 else:
                     raise TagMismatchError()
