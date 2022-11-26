@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: megacodist
-Version: 1.1.0
-Summary: A sorted list for Python.
+Version: 1.2.0
+Summary: A general library for Python.
 Home-page: https://github.com/megacodist/megacodist
 Author: Megacodist
 Author-email: megacodist@gmail.com
