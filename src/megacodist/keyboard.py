@@ -1,11 +1,12 @@
-from enum import IntEnum, IntFlag
+import enum
 
 
-class Modifiers(IntFlag):
+class Modifiers(enum.IntFlag):
     """Specifies modifiers for Key event. The 'state' attribute of Key event
     is an integer (actually a bit mask) which every bit specifies a modifier
     such as Alt, Num Lock, Button-1 (left mouse button) ans so on.
     """
+    NONE = 0x0000
     SHIFT = 0x0001
     CAPS_LOCK = 0x0002
     CONTROL = 0x0004
@@ -17,7 +18,7 @@ class Modifiers(IntFlag):
     ALT = 0x20000
 
 
-class KeyCodes(IntEnum):
+class KeyCodes(enum.IntEnum):
     BRACELEFT = 219
     BRACERIGHT = 221
     BRACKETLEFT = 219
